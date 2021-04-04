@@ -1,10 +1,11 @@
 provider "aws" {
   region                  = "us-east-2"
-  shared_credentials_file = "C:\\Users\\RS\\Desktop\\rootkey.csv"
+  #shared_credentials_file = "C:/Users/RS/Desktop/rootkey.csv"
+  profile = "ruslan.simakov"
 }
 
 variable "initialInfo" {
-  type = "string"
+  type = string
   default = <<EOF
       Terraform
       initiated  !!!
@@ -16,7 +17,7 @@ output "initDone" {
 }
 
 variable "maps" {
-  type = "map"
+  type = map
   default = {
     "useast" = "ami-1"
     "euwest" = "ami-2"
@@ -28,7 +29,7 @@ output "mapsoutput" {
 }
 
 variable "listkey" {
-  type = "list"
+  type = list
   default = ["ami2", "ami3"]
 }
 
@@ -45,10 +46,27 @@ output "booloutput" {
 }
 
 variable "inputVar" {
-  type = "string"
+  type = string
 }
 
 output "outputVar" {
   sensitive = true
   value = var.inputVar
+}
+
+resource "aws_s3_bucket" "b" {
+  bucket = "ruslan-simakov-tf-test-bucket"
+  acl    = "private"
+
+  tags = {
+    Name        = "My bucket"
+    Environment = "Dev"
+  }
+}
+
+resource "aws_s3_bucket_object" "object" {
+  bucket = aws_s3_bucket.b.id
+  key    = "rootkey"
+  source = "C:/Users/RS/Desktop/rootkey.csv"
+  etag = filemd5("C:/Users/RS/Desktop/rootkey.csv")
 }
